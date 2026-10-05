@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>AI對話</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui}
+.外框{max-width:600px;margin:40px auto;padding:0 16px}
+#輸入框{width:100%;height:120px;padding:10px;font-size:16px}
+#送出按鈕{margin:10px 0;padding:8px 16px;font-size:16px;cursor:pointer}
+#結果區{padding:12px;border:1px solid #ccc;min-height:100px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="外框">
+<h2>AI對話</h2>
+<textarea id="輸入框" placeholder="在這輸入問題"></textarea>
+<button id="送出按鈕">送出詢問AI</button>
+<div id="結果區">等待輸入內容...</div>
+</div>
+
+<script>
+// 把你的API金鑰貼在雙引號裡面
+const 金鑰 = "放你的API金鑰";
+
+document.getElementById("送出按鈕").onclick = async function(){
+const 訊息 = document.getElementById("輸入框").value;
+const 顯示區 = document.getElementById("結果區");
+顯示區.innerText = "讀取中...";
+try{
+const 回應 = await fetch("https://ai-gateway.vercel.app/v1/chat/completions",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization": `Bearer ${金鑰}`
+},
+body:JSON.stringify({
+model:"gpt-4o-mini",
+messages:[{role:"user", content:訊息}]
+})
+});
+const 資料 = await 回應.json();
+顯示區.innerText = 資料.choices[0].message.content;
+}catch(錯誤){
+顯示區.innerText = "發生錯誤："+錯誤;
+}
+}
+</script>
+</body>
+</html>
