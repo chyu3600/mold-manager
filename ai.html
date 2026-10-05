@@ -20,27 +20,29 @@
 </div>
 
 <script>
-// 把你的API金鑰貼在雙引號裡面
-const 金鑰 = "放你的API金鑰";
+// API金鑰已改存於 Vercel 環境變數，由 /api/chat 代理處理，前端不再存放金鑰
 
 document.getElementById("送出按鈕").onclick = async function(){
 const 訊息 = document.getElementById("輸入框").value;
 const 顯示區 = document.getElementById("結果區");
 顯示區.innerText = "讀取中...";
 try{
-const 回應 = await fetch("https://ai-gateway.vercel.app/v1/chat/completions",{
+const 回應 = await fetch("/api/chat",{
 method:"POST",
 headers:{
-"Content-Type":"application/json",
-"Authorization": `Bearer ${金鑰}`
+"Content-Type":"application/json"
 },
 body:JSON.stringify({
 model:"gpt-4o-mini",
-messages:[{role:"user", content:訊息}]
+訊息:訊息
 })
 });
 const 資料 = await 回應.json();
+if(資料.choices && 資料.choices[0]){
 顯示區.innerText = 資料.choices[0].message.content;
+}else{
+顯示區.innerText = "伺服器回應異常："+(資料.error || 資料.detail || JSON.stringify(資料));
+}
 }catch(錯誤){
 顯示區.innerText = "發生錯誤："+錯誤;
 }
